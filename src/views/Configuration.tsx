@@ -13,7 +13,6 @@ import HomePanel from "./configuration/HomePanel";
 import SystemInfoPanel from "./configuration/SystemInfoPanel";
 import KernelPanel from "./configuration/KernelPanel";
 import DevicesPanel from "./configuration/DevicesPanel";
-import MirrorsPanel from "./configuration/MirrorsPanel";
 import UpdatesPanel from "./configuration/UpdatesPanel";
 import StoragePanel from "./configuration/StoragePanel";
 import PersonalizationPanel from "./configuration/PersonalizationPanel";
@@ -92,7 +91,6 @@ const Configuration: React.FC = () => {
     { id: "hardware", name: t("hardware_configuration"), icon: "hardware" },
     { id: "devices", name: t("devices"), icon: "devices" },
     { id: "network", name: t("network_info"), icon: "network" },
-    { id: "mirrors", name: t("mirrors"), icon: "mirrors" },
     { id: "updates", name: t("updates"), icon: "updates" },
     { id: "storage", name: t("storage"), icon: "storage" },
     {
@@ -124,8 +122,6 @@ const Configuration: React.FC = () => {
         return <DevicesPanel />;
       case "network":
         return <NetworkPanel />;
-      case "mirrors":
-        return <MirrorsPanel />;
       case "updates":
         return <UpdatesPanel />;
       case "storage":
