@@ -18,6 +18,9 @@ use system::start_system_monitor; // Import the new command
 
 mod bluetooth;
 mod printers;
+mod locale;
+mod reboot;
+use locale::{generate_locale, get_locale_status, set_system_locale};
 
 
 #[tauri::command]
@@ -309,6 +312,9 @@ pub fn run() {
             get_system_user_info,
             get_user_profile_photo_base64,
             run_elevated_command,
+            get_locale_status,
+            set_system_locale,
+            generate_locale,
 printers::get_printers, 
             printers::add_printer_cmd, 
             printers::remove_printer_cmd,

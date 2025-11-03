@@ -226,3 +226,22 @@ pub enum PrinterEvent {
     Removed(String),
     Error(String),
 }
+
+#[derive(Serialize, Deserialize, Debug, Clone, Default)]
+pub struct LocaleInfo {
+    pub lang: String,
+    pub lc_collate: String,
+    pub lc_ctype: String,
+    pub lc_messages: String,
+    pub lc_monetary: String,
+    pub lc_numeric: String,
+    pub lc_time: String,
+}
+
+#[derive(Serialize, Deserialize, Debug, Clone)]
+pub struct LocaleStatus {
+    pub current: LocaleInfo,
+    pub available_locales: Vec<String>,
+    pub generated_locales: Vec<String>,
+    pub reboot_required: bool,
+}
