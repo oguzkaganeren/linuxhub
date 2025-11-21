@@ -34,4 +34,4 @@ futures = "0.3.31"
 chrono = { version = "0.4", features = ["serde"] }
 bluer = { version = "0.17.4", features = ["full", "serde"] }
 anyhow = "1.0.100"
-printers = "2.2.0"  # For listing/basic info
+printers = "2.2.1"  # For listing/basic info
