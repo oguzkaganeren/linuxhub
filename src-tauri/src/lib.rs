@@ -37,8 +37,8 @@ fn run_shell_command_with_result(command: String) -> String {
 
 #[tauri::command]
 fn get_system_user_info() -> String {
-    let username = whoami::username();
-    let realname = whoami::realname();
+    let username = whoami::username().unwrap_or_else(|_| "user".to_string());
+    let realname = whoami::realname().unwrap_or_else(|_| "User".to_string());
 
     // Combine into a simple JSON string or a structured object for the frontend
     format!("{{\"username\": \"{}\", \"realname\": \"{}\"}}", username, realname)
