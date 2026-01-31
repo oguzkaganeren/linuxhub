@@ -5,7 +5,6 @@ import {
   Settings,
   Package,
   Server,
-  Wifi,
   RefreshCw,
   HardDrive,
   Palette,

@@ -5,7 +5,6 @@ import AppIcon from "../../components/icons";
 import { useAppSelector } from "../../store/hooks";
 import { translations } from "../../data/translations";
 import { selectSystemInfo, selectSystemStatus } from "../../store/systemSlice";
-import { ProcessInfo } from "../../types";
 
 const ProcessesPanel: React.FC = () => {
   const language = useAppSelector((state) => state.app.language);

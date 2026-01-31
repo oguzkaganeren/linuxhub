@@ -2,7 +2,7 @@ import React, { useCallback, useEffect, useState } from "react";
 import toast from "react-hot-toast";
 import { Plus, X, Loader, RefreshCw } from "lucide-react";
 import { listen } from "@tauri-apps/api/event";
-import { motion, AnimatePresence } from "framer-motion";
+import { AnimatePresence } from "framer-motion";
 
 import BlurredCard from "../../components/BlurredCard";
 import Panel from "../../components/configuration/Panel";

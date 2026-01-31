@@ -8,7 +8,7 @@ import { useAppSelector, useAppDispatch } from "../../store/hooks";
 import { setPrimaryColor } from "../../store/themeSlice";
 import { install } from "../../store/packagesSlice";
 import { translations } from "../../data/translations";
-import { ConfigPanel, PackageStatus, Kernel, DiskInfo } from "../../types";
+import { ConfigPanel, PackageStatus, Kernel } from "../../types";
 import { colors } from "../../data/config";
 import { selectSystemInfo, selectSystemStatus } from "../../store/systemSlice";
 
@@ -126,14 +126,14 @@ const HomePanel: React.FC<{ setActivePanel: (panel: ConfigPanel) => void }> = ({
     icon: string;
     panel: ConfigPanel;
   }[] = [
-    { name: t("storage"), icon: "storage", panel: "storage" },
-    { name: t("devices"), icon: "devices", panel: "devices" },
-    {
-      name: t("personalization"),
-      icon: "personalization",
-      panel: "personalization",
-    },
-  ];
+      { name: t("storage"), icon: "storage", panel: "storage" },
+      { name: t("devices"), icon: "devices", panel: "devices" },
+      {
+        name: t("personalization"),
+        icon: "personalization",
+        panel: "personalization",
+      },
+    ];
 
   const loading = otherInfoLoading || systemStatus === "idle" || !sysInfo;
 
@@ -177,7 +177,7 @@ const HomePanel: React.FC<{ setActivePanel: (panel: ConfigPanel) => void }> = ({
     ? t("updates_available_header", { count: updateInfo.pending_updates_count })
     : t("system_up_to_date");
   const updateSubtitle = `${t("last_check")}: ${formatLastCheck(
-    updateInfo?.last_update_date
+    updateInfo?.last_update_date ?? null
   )}`;
 
   const hostname = sysInfo.os_info?.host_name || "LinuxDesktop";
@@ -249,11 +249,10 @@ const HomePanel: React.FC<{ setActivePanel: (panel: ConfigPanel) => void }> = ({
                 key={color}
                 onClick={() => dispatch(setPrimaryColor(color))}
                 style={{ backgroundColor: color }}
-                className={`w-full h-20 rounded-lg transition-transform transform hover:scale-105 ${
-                  theme.primaryColor === color
+                className={`w-full h-20 rounded-lg transition-transform transform hover:scale-105 ${theme.primaryColor === color
                     ? "ring-4 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-800 ring-white"
                     : ""
-                }`}
+                  }`}
               />
             ))}
             <div className="w-full h-20 rounded-lg bg-gray-200 dark:bg-gray-700 flex items-center justify-center font-medium text-sm">

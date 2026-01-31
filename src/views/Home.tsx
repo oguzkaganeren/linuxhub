@@ -2,8 +2,7 @@ import React, { useCallback } from 'react';
 import BlurredCard from '../components/BlurredCard';
 import AppIcon from '../components/icons';
 import { motion } from 'framer-motion';
-import { useAppSelector, useAppDispatch } from '../store/hooks';
-import { navigateTo } from '../store/appSlice';
+import { useAppSelector } from '../store/hooks';
 import { translations } from '../data/translations';
 import { Page } from '../types';
 

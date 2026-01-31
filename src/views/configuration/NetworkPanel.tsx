@@ -5,7 +5,6 @@ import AppIcon from "../../components/icons";
 import { useAppSelector } from "../../store/hooks";
 import { translations } from "../../data/translations";
 import { selectSystemInfo, selectSystemStatus } from "../../store/systemSlice";
-import { NetworkInfo } from "../../types";
 
 const NetworkPanel: React.FC = () => {
   const language = useAppSelector((state) => state.app.language);

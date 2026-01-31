@@ -7,7 +7,6 @@ import AppIcon from "../../components/icons";
 import { useAppSelector } from "../../store/hooks";
 import { translations } from "../../data/translations";
 import { selectSystemInfo, selectSystemStatus } from "../../store/systemSlice";
-import { UserInfo } from "../../types";
 
 const UsersPanel: React.FC = () => {
   const language = useAppSelector((state) => state.app.language);
@@ -80,9 +79,8 @@ const UsersPanel: React.FC = () => {
                   {user.groups.length} groups
                 </span>
                 <ChevronRight
-                  className={`w-5 h-5 transition-transform ${
-                    expandedUser === user.name ? "rotate-90" : ""
-                  }`}
+                  className={`w-5 h-5 transition-transform ${expandedUser === user.name ? "rotate-90" : ""
+                    }`}
                 />
               </div>
             </button>

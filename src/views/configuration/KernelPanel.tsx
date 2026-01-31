@@ -1,5 +1,4 @@
 import React, { useState, useCallback, useEffect } from "react";
-import toast from "react-hot-toast";
 import { motion, AnimatePresence } from "framer-motion";
 import { invoke } from "@tauri-apps/api/core";
 import BlurredCard from "../../components/BlurredCard";
@@ -296,13 +295,11 @@ const KernelPanel: React.FC = () => {
             {paginatedKernels.map((k) => (
               <div
                 key={`${k.pkg}-${k.version}`}
-                className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
-                  k.running ? "bg-[var(--primary-color)]/10" : ""
-                } ${
-                  packagesState[k.pkg]?.status === PackageStatus.Error
+                className={`flex justify-between items-center p-3 rounded-lg transition-colors ${k.running ? "bg-[var(--primary-color)]/10" : ""
+                  } ${packagesState[k.pkg]?.status === PackageStatus.Error
                     ? "bg-red-500/10"
                     : "hover:bg-gray-100/80 dark:hover:bg-gray-700/50"
-                }`}
+                  }`}
               >
                 <div className="flex-grow pr-4 overflow-hidden">
                   <p

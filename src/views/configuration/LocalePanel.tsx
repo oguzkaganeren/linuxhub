@@ -170,13 +170,6 @@ const LocalePanel: React.FC = () => {
     []
   );
 
-  const handleSetDisplay = (localeId: string) => {
-    applyLocaleChange({
-      lang: localeId,
-      lc_messages: localeId,
-      lc_ctype: localeId,
-    });
-  };
 
   const handleSetFormat = (localeId: string) => {
     applyLocaleChange({
@@ -400,21 +393,19 @@ const LocalePanel: React.FC = () => {
       <div className="flex items-center gap-4 mb-4">
         <button
           onClick={() => setActiveTab("system")}
-          className={`px-4 py-2 rounded-md font-semibold transition-colors ${
-            activeTab === "system"
+          className={`px-4 py-2 rounded-md font-semibold transition-colors ${activeTab === "system"
               ? "bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-100"
               : "bg-transparent text-gray-600 dark:text-gray-400"
-          }`}
+            }`}
         >
           {t("system_locales")}
         </button>
         <button
           onClick={() => setActiveTab("detailed")}
-          className={`px-4 py-2 rounded-md font-semibold transition-colors ${
-            activeTab === "detailed"
+          className={`px-4 py-2 rounded-md font-semibold transition-colors ${activeTab === "detailed"
               ? "bg-gray-300 dark:bg-gray-600 text-gray-800 dark:text-gray-100"
               : "bg-transparent text-gray-600 dark:text-gray-400"
-          }`}
+            }`}
         >
           {t("detailed_settings")}
         </button>
