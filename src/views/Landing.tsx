@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useAppSelector } from "../store/hooks";
 import { translations } from "../data/translations";
 import { Command } from "@tauri-apps/plugin-shell";
+import { invoke } from "@tauri-apps/api/core";
 import toast from "react-hot-toast";
 
 interface LandingProps {
@@ -25,6 +26,20 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
     },
     [language]
   );
+
+  const [distro, setDistro] = React.useState<string>("Linux");
+
+  React.useEffect(() => {
+    const fetchDistro = async () => {
+      try {
+        const result = await invoke<string>("get_distro");
+        setDistro(result);
+      } catch (error) {
+        console.error("Failed to fetch distro:", error);
+      }
+    };
+    fetchDistro();
+  }, []);
 
   const handleInstall = async () => {
     try {
@@ -152,7 +167,7 @@ const Landing: React.FC<LandingProps> = ({ onStart }) => {
             {t("welcome_to")}
             <br />
             <span className="bg-gradient-to-r from-[var(--primary-color)] to-purple-500 bg-clip-text text-transparent">
-              {t("app_name")}
+              {distro}
             </span>
           </motion.h1>
           <motion.p

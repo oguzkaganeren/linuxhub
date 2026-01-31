@@ -44,6 +44,11 @@ fn get_system_user_info() -> String {
     format!("{{\"username\": \"{}\", \"realname\": \"{}\"}}", username, realname)
 }
 
+#[tauri::command]
+fn get_distro() -> String {
+    System::name().unwrap_or_else(|| "Linux".to_string())
+}
+
 
 
 #[derive(Serialize)]
@@ -289,6 +294,10 @@ fn run_elevated_command(command_to_run: String) -> Result<String, String> {
 
 #[cfg_attr(mobile, tauri::mobile_entry_point)]
 pub fn run() {
+    #[cfg(target_os = "linux")]
+unsafe { // Not unsafe if you don't use edition 2024
+    std::env::set_var("WEBKIT_DISABLE_DMABUF_RENDERER", "1");
+}
     tauri::Builder::default()
         .plugin(tauri_plugin_fs::init())
         .setup(|app| {
@@ -331,7 +340,8 @@ printers::get_printers,
             bluetooth::pair_device,
             bluetooth::remove_device,
             bluetooth::list_paired_devices,
-            get_system_kernels])
+            get_system_kernels,
+            get_distro])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
 }
