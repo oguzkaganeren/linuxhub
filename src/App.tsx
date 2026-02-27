@@ -3,6 +3,7 @@ import Landing from "./views/Landing";
 import Home from "./views/Home";
 import Packages from "./views/Packages";
 import Configuration from "./views/Configuration";
+import Documentation from "./views/Documentation";
 import About from "./views/About";
 import TitleBar from "./components/TitleBar";
 import StatusBar from "./components/StatusBar";
@@ -209,6 +210,8 @@ const App: React.FC = () => {
         return <Packages />;
       case "configuration":
         return <Configuration />;
+      case "documentation":
+        return <Documentation />;
       case "about":
         return <About />;
       default:

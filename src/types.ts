@@ -3,7 +3,7 @@
 // FIX: Update the PackageStatus enum to include an `Error` state,
 // and add an optional `error` message field to the `PackageState` interface
 // to store detailed error information.
-export type Page = 'landing' | 'home' | 'packages' | 'configuration' | 'about';
+export type Page = 'landing' | 'home' | 'packages' | 'configuration' | 'documentation' | 'about';
 
 export type ConfigPanel = 'home'|'system' | 'kernel' | 'updates' | 'storage' | 'monitor' | 'devices' | 'locale' | 'hardware' | 'processes' | 'sensors' | 'network' | 'users';
 

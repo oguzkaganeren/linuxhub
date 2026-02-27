@@ -7,7 +7,7 @@ import { translations } from '../data/translations';
 import { Page } from '../types';
 
 interface HomeProps {
-  navigate: (page: Extract<Page, 'packages' | 'configuration'>) => void;
+  navigate: (page: Extract<Page, 'packages' | 'configuration' | 'documentation'>) => void;
 }
 
 const Home: React.FC<HomeProps> = ({ navigate }) => {
@@ -45,6 +45,18 @@ const Home: React.FC<HomeProps> = ({ navigate }) => {
       initial="hidden"
       animate="visible"
     >
+      <motion.div variants={itemVariants} className="w-full md:w-1/3 h-1/2 md:h-2/3">
+        <BlurredCard
+          onClick={() => navigate('documentation')}
+          className="w-full h-full p-6 md:p-8 flex flex-col items-center justify-center gap-4 md:gap-6 text-center cursor-pointer hover:border-[var(--primary-color)]/50 hover:scale-105"
+        >
+          <AppIcon name="default" className="w-16 h-16 md:w-20 lg:w-24 h-auto text-[var(--primary-color)]" />
+          <h2 className="text-2xl md:text-3xl lg:text-4xl font-bold">{t('documentation')}</h2>
+          <p className="text-base md:text-lg text-gray-600 dark:text-gray-300">
+            {t('documentation_desc')}
+          </p>
+        </BlurredCard>
+      </motion.div>
       <motion.div variants={itemVariants} className="w-full md:w-1/3 h-1/2 md:h-2/3">
         <BlurredCard
           onClick={() => navigate('configuration')}
