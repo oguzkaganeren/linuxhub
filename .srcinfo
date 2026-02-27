@@ -1,0 +1,26 @@
+pkgbase = linuxhub
+	pkgdesc = A tool providing access to documentation and support for new linux users
+	pkgver = 0.1.0
+	pkgrel = 1
+	url = https://github.com/oguzkaganeren/linuxhub
+	arch = x86_64
+	license = MIT
+	makedepends = cargo
+	makedepends = npm
+	makedepends = typescript
+	makedepends = nodejs
+	makedepends = base-devel
+	depends = gtk3
+	depends = libappindicator-gtk3
+	depends = libxcb
+	depends = libxkbcommon
+	depends = openssl
+	depends = webkit2gtk-4.1
+	source = git+https://github.com/oguzkaganeren/linuxhub.git#tag=v0.1.0
+	source = linuxhub.desktop
+	source = linuxhub.service
+	sha256sums = SKIP
+	sha256sums = SKIP
+	sha256sums = SKIP
+
+pkgname = linuxhub

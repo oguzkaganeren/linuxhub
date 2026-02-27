@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=LinuxHub
+Comment=A tool providing access to documentation and support for new linux users
+Icon=linuxhub
+Exec=linuxhub
+Categories=System;Utility;
+Terminal=false

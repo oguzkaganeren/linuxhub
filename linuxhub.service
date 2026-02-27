@@ -1,0 +1,6 @@
+[Unit]
+Description=LinuxHub Application
+Documentation=https://github.com/oguzkaganeren/linuxhub
+
+[Install]
+WantedBy=default.target
