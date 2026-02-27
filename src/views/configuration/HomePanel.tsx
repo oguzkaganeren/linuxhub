@@ -128,11 +128,6 @@ const HomePanel: React.FC<{ setActivePanel: (panel: ConfigPanel) => void }> = ({
   }[] = [
       { name: t("storage"), icon: "storage", panel: "storage" },
       { name: t("devices"), icon: "devices", panel: "devices" },
-      {
-        name: t("personalization"),
-        icon: "personalization",
-        panel: "personalization",
-      },
     ];
 
   const loading = otherInfoLoading || systemStatus === "idle" || !sysInfo;

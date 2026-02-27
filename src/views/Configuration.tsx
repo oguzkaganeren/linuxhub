@@ -15,7 +15,6 @@ import KernelPanel from "./configuration/KernelPanel";
 import DevicesPanel from "./configuration/DevicesPanel";
 import UpdatesPanel from "./configuration/UpdatesPanel";
 import StoragePanel from "./configuration/StoragePanel";
-import PersonalizationPanel from "./configuration/PersonalizationPanel";
 import SystemMonitorPanel from "./configuration/SystemMonitorPanel";
 import LocalePanel from "./configuration/LocalePanel";
 import HardwarePanel from "./configuration/HardwarePanel";
@@ -93,11 +92,6 @@ const Configuration: React.FC = () => {
     { id: "network", name: t("network_info"), icon: "network" },
     { id: "updates", name: t("updates"), icon: "updates" },
     { id: "storage", name: t("storage"), icon: "storage" },
-    {
-      id: "personalization",
-      name: t("personalization"),
-      icon: "personalization",
-    },
     { id: "users", name: t("users"), icon: "users" },
     { id: "locale", name: t("locale_settings"), icon: "locale" },
   ];
@@ -126,8 +120,6 @@ const Configuration: React.FC = () => {
         return <UpdatesPanel />;
       case "storage":
         return <StoragePanel />;
-      case "personalization":
-        return <PersonalizationPanel />;
       case "users":
         return <UsersPanel />;
       case "locale":

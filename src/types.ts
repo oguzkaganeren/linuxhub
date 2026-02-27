@@ -5,7 +5,7 @@
 // to store detailed error information.
 export type Page = 'landing' | 'home' | 'packages' | 'configuration' | 'about';
 
-export type ConfigPanel = 'home'|'system' | 'kernel' | 'updates' | 'storage' | 'personalization' | 'monitor' | 'devices' | 'locale' | 'hardware' | 'processes' | 'sensors' | 'network' | 'users';
+export type ConfigPanel = 'home'|'system' | 'kernel' | 'updates' | 'storage' | 'monitor' | 'devices' | 'locale' | 'hardware' | 'processes' | 'sensors' | 'network' | 'users';
 
 export interface App {
   name: string;
