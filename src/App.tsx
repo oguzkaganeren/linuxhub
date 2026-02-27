@@ -233,9 +233,9 @@ const App: React.FC = () => {
         }}
       />
       <TitleBar
-        showBackButton={page !== "landing" && page !== "home"}
+        showBackButton={page !== "landing"}
         showMenuButton={page === "packages" || page === "configuration"}
-        onBack={() => handleNavigate("home")}
+        onBack={() => handleNavigate(page === "home" ? "landing" : "home")}
       />
       <main className="flex-grow relative">
         <AnimatePresence mode="wait">
