@@ -14,6 +14,11 @@ import AppCardSkeleton from "../components/packages/AppCardSkeleton";
 import AppDetailsModal from "../components/packages/AppDetailsModal";
 import AppCard from "../components/packages/AppCard";
 
+// Helper to keep the onShowDetails reference stable for React.memo
+const AppCardWrapper = React.memo(({ app, onShowDetails }: { app: App, onShowDetails: (app: App) => void }) => {
+  return <AppCard app={app} onShowDetails={() => onShowDetails(app)} />;
+});
+
 const Packages: React.FC = () => {
   const language = useAppSelector((state) => state.app.language);
   const packagesGlobalStatus = useAppSelector((state) => state.packages.status);
@@ -35,6 +40,11 @@ const Packages: React.FC = () => {
   const [selectedApp, setSelectedApp] = useState<App | null>(null);
   const [localLoading, setLocalLoading] = useState(true);
   const [filteredApps, setFilteredApps] = useState<App[]>([]);
+
+  // ⚡ Bolt Optimization: Use a stable callback for AppCard clicks to prevent React.memo invalidation
+  const handleShowDetails = useCallback((app: App) => {
+    setSelectedApp(app);
+  }, []);
 
   useEffect(() => {
     setLocalLoading(true);
@@ -175,9 +185,9 @@ const Packages: React.FC = () => {
               >
                 {filteredApps.map((app) => (
                   <motion.div key={app.pkg} variants={itemVariants}>
-                    <AppCard
+                    <AppCardWrapper
                       app={app}
-                      onShowDetails={() => setSelectedApp(app)}
+                      onShowDetails={handleShowDetails}
                     />
                   </motion.div>
                 ))}
