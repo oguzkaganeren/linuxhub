@@ -6,12 +6,15 @@ import { translations } from "../../data/translations";
 import BlurredCard from "../BlurredCard";
 import AppIcon from "../icons";
 
-const AppCard: React.FC<{ app: App; onShowDetails: () => void }> = ({
+const AppCard: React.FC<{ app: App; onShowDetails: () => void }> = React.memo(({
   app,
   onShowDetails,
 }) => {
   const dispatch = useAppDispatch();
-  const packagesState = useAppSelector((state) => state.packages.packagesState);
+  // ⚡ Bolt Optimization: Only subscribe to this specific package's state
+  // Previously: const packagesState = useAppSelector((state) => state.packages.packagesState);
+  // This caused ALL AppCards to re-render when ANY package changed its install status!
+  const state = useAppSelector((state) => state.packages.packagesState[app.pkg]);
   const language = useAppSelector((state) => state.app.language);
   const t = useCallback(
     (key: string): string => {
@@ -19,8 +22,6 @@ const AppCard: React.FC<{ app: App; onShowDetails: () => void }> = ({
     },
     [language]
   );
-
-  const state = packagesState[app.pkg];
 
   const handleInstall = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -121,6 +122,6 @@ const AppCard: React.FC<{ app: App; onShowDetails: () => void }> = ({
       </div>
     </BlurredCard>
   );
-};
+});
 
 export default AppCard;

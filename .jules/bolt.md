@@ -1,0 +1,3 @@
+## 2024-05-19 - Redux useSelector Over-Subscribing in Lists
+**Learning:** Using `useAppSelector` to grab an entire dictionary object (like `packagesState`) inside a list item component (`AppCard`) causes *every* item in the list to re-render whenever *any* item's state changes.
+**Action:** Always select only the specific item's state (e.g., `state.packages.packagesState[app.pkg]`) inside list components. Combine this with `React.memo` and stable callback props (using `useCallback` or wrapper components) to completely eliminate unnecessary re-renders in large lists.
