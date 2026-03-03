@@ -1,0 +1,3 @@
+## 2024-03-03 - TitleBar Accessibility Overhaul
+**Learning:** Found a consistent pattern where critical system interaction buttons (minimize, maximize, close, settings, theme toggle) in the main TitleBar component were entirely icon-based without any accessible names, making the application difficult to navigate for screen reader users. The application relies heavily on `lucide-react` icons for navigation and actions.
+**Action:** When adding or reviewing new icon-only buttons globally across the application, ensure `aria-label` or equivalent accessible text is included as a mandatory requirement, especially for window management and high-level navigation controls.

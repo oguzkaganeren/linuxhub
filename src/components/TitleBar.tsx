@@ -49,6 +49,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <button
             onClick={() => dispatch(toggleSidebar())}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Toggle sidebar"
           >
             <Menu size={20} />
           </button>
@@ -57,6 +58,7 @@ const TitleBar: React.FC<TitleBarProps> = ({
           <button
             onClick={onBack}
             className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            aria-label="Go back"
           >
             <ArrowLeft size={20} />
           </button>
@@ -69,30 +71,35 @@ const TitleBar: React.FC<TitleBarProps> = ({
         <button
           onClick={() => dispatch(toggleThemeMode())}
           className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Toggle theme"
         >
           {theme.mode === "dark" ? <Sun size={18} /> : <Moon size={18} />}
         </button>
         <button
           onClick={() => dispatch(openSettingsModal())}
           className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Open settings"
         >
           <Settings size={18} />
         </button>
         <button
           onClick={handleMinimize}
           className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Minimize window"
         >
           <Minus size={18} />
         </button>
         <button
           onClick={handleToggleMaximize}
           className="p-2 rounded hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+          aria-label="Maximize window"
         >
           <Square size={16} />
         </button>
         <button
           onClick={handleClose}
           className="p-2 rounded hover:bg-red-500/80 transition-colors"
+          aria-label="Close window"
         >
           <X size={18} />
         </button>
