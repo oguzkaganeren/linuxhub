@@ -131,6 +131,7 @@ const AppDetailsModal: React.FC<AppDetailsModalProps> = ({ app, onClose }) => {
         <button
           onClick={onClose}
           className="absolute top-4 right-4 p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-colors z-10"
+          aria-label={t("close")}
         >
           <X size={24} />
         </button>
