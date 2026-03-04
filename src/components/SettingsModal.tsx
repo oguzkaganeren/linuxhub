@@ -45,7 +45,7 @@ const SettingsModal: React.FC = () => {
                 >
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl md:text-2xl font-bold">{t('app_settings')}</h2>
-                        <button onClick={handleClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <button onClick={handleClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" aria-label={t('close')}>
                             <X size={24} />
                         </button>
                     </div>
@@ -78,8 +78,8 @@ const SettingsModal: React.FC = () => {
                                 <div className="flex items-center justify-between p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50">
                                     <span className="font-medium">{t('theme')}</span>
                                     <div className="flex items-center gap-2 p-1 rounded-lg bg-gray-200 dark:bg-gray-700">
-                                        <button onClick={() => dispatch(toggleThemeMode())} disabled={theme.mode === 'light'} className={`p-1.5 rounded ${theme.mode === 'light' ? 'bg-white dark:bg-gray-500' : ''}`}><Sun size={18}/></button>
-                                        <button onClick={() => dispatch(toggleThemeMode())} disabled={theme.mode === 'dark'} className={`p-1.5 rounded ${theme.mode === 'dark' ? 'bg-white dark:bg-gray-500' : ''}`}><Moon size={18}/></button>
+                                        <button onClick={() => dispatch(toggleThemeMode())} disabled={theme.mode === 'light'} className={`p-1.5 rounded ${theme.mode === 'light' ? 'bg-white dark:bg-gray-500' : ''}`} aria-label={t('light_mode')}><Sun size={18}/></button>
+                                        <button onClick={() => dispatch(toggleThemeMode())} disabled={theme.mode === 'dark'} className={`p-1.5 rounded ${theme.mode === 'dark' ? 'bg-white dark:bg-gray-500' : ''}`} aria-label={t('dark_mode')}><Moon size={18}/></button>
                                     </div>
                                 </div>
                                 <div className="p-3 rounded-lg bg-gray-100 dark:bg-gray-800/50">
