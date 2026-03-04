@@ -15,7 +15,10 @@ interface AppDetailsModalProps {
 
 const AppDetailsModal: React.FC<AppDetailsModalProps> = ({ app, onClose }) => {
   const dispatch = useAppDispatch();
-  const packagesState = useAppSelector((state) => state.packages.packagesState);
+  // ⚡ Bolt Optimization: Only subscribe to this specific package's state.
+  // This prevents the entire modal from needlessly re-rendering whenever
+  // any other package's installation progress updates.
+  const state = useAppSelector((state) => state.packages.packagesState[app.pkg]);
   const language = useAppSelector((state) => state.app.language);
   const t = useCallback(
     (key: string): string => {
@@ -45,7 +48,6 @@ const AppDetailsModal: React.FC<AppDetailsModalProps> = ({ app, onClose }) => {
   };
 
   const renderModalButton = () => {
-    const state = packagesState[app.pkg];
     if (!state) return null;
 
     switch (state.status) {
