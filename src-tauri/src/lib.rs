@@ -30,9 +30,10 @@ async fn hardware_info() -> Result<String, String> {
 }
 // Learn more about Tauri commands at https://tauri.app/develop/calling-rust/
 #[tauri::command]
-fn run_shell_command_with_result(command: String) -> String {
-    let output = Command::new("sh").arg("-c").arg(command).output().unwrap();
-    return format!("{:?}", String::from_utf8_lossy(&output.stdout));
+fn run_shell_command_with_result(program: String, args: Vec<String>) -> Result<String, String> {
+    let output = Command::new(&program).args(&args).output()
+        .map_err(|e| format!("Failed to execute process: {}", e))?;
+    Ok(String::from_utf8_lossy(&output.stdout).to_string())
 }
 
 #[tauri::command]
@@ -240,25 +241,24 @@ fn get_user_profile_photo_base64() -> Result<String, String> {
     Ok(format!("data:{};base64,{}", mime_type, base64_image))
 }
 
-/// Executes a given command string using pkexec to gain root privileges.
+/// Executes a given command using pkexec to gain root privileges.
 ///
 /// This function triggers the native PolicyKit graphical password prompt.
 ///
-/// @param command_to_run: The command string to execute (e.g., "apt update").
+/// @param program: The program to execute.
+/// @param args: The arguments to pass to the program.
 /// @returns A Result containing the combined stdout/stderr output on success, 
 ///          or a detailed error message on failure (including user cancellation).
 #[tauri::command]
-fn run_elevated_command(command_to_run: String) -> Result<String, String> {
+fn run_elevated_command(program: String, args: Vec<String>) -> Result<String, String> {
     
     // --- Security Note ---
-    // It is safer to pass arguments separately rather than using "sh -c",
-    // but for simple commands, this structure is functional for pkexec.
+    // Safely pass arguments separately to avoid command injection via sh -c.
     
     // 1. Prepare the full pkexec command
     let mut command = StdCommand::new("/usr/bin/pkexec");
     
-    // This structure passes the command string to a shell for execution with elevated rights.
-    command.arg("sh").arg("-c").arg(&command_to_run);
+    command.arg(&program).args(&args);
 
     // 2. Execute and capture output
     match command.output() {
