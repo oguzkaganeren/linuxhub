@@ -35,6 +35,18 @@ fn emit_event(app: &AppHandle, event: PrinterEvent) -> Result<(), String> {
 
 fn list_printers_inner(app: AppHandle) -> Result<(), String> {
     let output = run_command("lpstat", &["-p", "-e"])?;
+
+    // ⚡ Bolt: Query default printer once before the loop (O(1)) instead of for every printer (O(N)).
+    // Eliminates N external `lpstat -d` process spawns, drastically speeding up enumeration on systems with many printers.
+    let default_printer_name = run_command("lpstat", &["-d"])
+        .ok()
+        .and_then(|s| {
+            s.lines()
+                .find(|l| l.contains("system default destination:"))
+                .and_then(|l| l.split(':').nth(1))
+                .map(|s| s.trim().to_string())
+        });
+
     let mut printers = Vec::new();
 
     for line in output.lines() {
@@ -91,16 +103,7 @@ fn list_printers_inner(app: AppHandle) -> Result<(), String> {
         };
 
         // === Default printer ===
-        let is_default = run_command("lpstat", &["-d"])
-            .ok()
-            .and_then(|s| {
-                s.lines()
-                    .find(|l| l.contains("system default destination:"))
-                    .and_then(|l| l.split(':').nth(1))
-                    .map(|s| s.trim().to_string())
-            })
-            .map(|default_name| default_name == name)
-            .unwrap_or(false);
+        let is_default = default_printer_name.as_deref() == Some(&name);
 
         printers.push(Printer {
             name: name.clone(),
