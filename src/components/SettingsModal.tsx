@@ -86,7 +86,7 @@ const SettingsModal: React.FC = () => {
                                     <p className="font-medium mb-3">{t('accent_color')}</p>
                                     <div className="grid grid-cols-5 gap-4">
                                         {colors.map(color => (
-                                            <button key={color} onClick={() => dispatch(setPrimaryColor(color))} style={{backgroundColor: color}} className={`w-full h-12 rounded-lg transition-transform transform hover:scale-105 ${theme.primaryColor === color ? 'ring-4 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-800 ring-white' : ''}`} />
+                                            <button key={color} onClick={() => dispatch(setPrimaryColor(color))} style={{backgroundColor: color}} aria-label={`Select accent color ${color}`} className={`w-full h-12 rounded-lg transition-transform transform hover:scale-105 ${theme.primaryColor === color ? 'ring-4 ring-offset-2 ring-offset-gray-100 dark:ring-offset-gray-800 ring-white' : ''}`} />
                                         ))}
                                     </div>
                                 </div>
