@@ -77,7 +77,7 @@ const AddLocaleModal: React.FC<AddLocaleModalProps> = ({ onClose, onAdd }) => {
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-6">
                         <h2 className="text-xl md:text-2xl font-bold">{t('add_locale')}</h2>
-                        <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700">
+                        <button onClick={onClose} className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700" aria-label={t('close')}>
                             <X size={24} />
                         </button>
                     </div>

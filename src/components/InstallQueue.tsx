@@ -59,6 +59,7 @@ const InstallQueue: React.FC<InstallQueueProps> = ({ onClose }) => {
           <button
             onClick={onClose}
             className="p-1 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+            aria-label={t("close")}
           >
             <X size={20} />
           </button>

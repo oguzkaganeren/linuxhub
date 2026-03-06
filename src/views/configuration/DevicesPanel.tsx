@@ -211,6 +211,7 @@ const DevicesPanel: React.FC = () => {
           <button
             onClick={() => handleRemove(device)}
             className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-500/20 hover:text-red-500 transition-colors"
+            aria-label="Remove device"
           >
             <X size={18} />
           </button>
@@ -325,6 +326,7 @@ const DevicesPanel: React.FC = () => {
                 <button
                   onClick={() => handleRemovePrinter(printer.name)}
                   className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-500/20 hover:text-red-500 transition-colors"
+                  aria-label="Remove printer"
                 >
                   <X size={18} />
                 </button>

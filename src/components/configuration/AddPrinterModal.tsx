@@ -106,6 +106,7 @@ const AddPrinterModal: React.FC<AddPrinterModalProps> = ({ onClose }) => {
             <button
               onClick={onClose}
               className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              aria-label={t("close")}
             >
               <X size={24} />
             </button>
