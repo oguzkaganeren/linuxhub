@@ -4,6 +4,8 @@ import AppIcon from '../components/icons';
 import { motion } from 'framer-motion';
 import { useAppSelector } from '../store/hooks';
 import { translations } from '../data/translations';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 const About: React.FC = () => {
   const language = useAppSelector(state => state.app.language);
@@ -12,52 +14,8 @@ const About: React.FC = () => {
   }, [language]);
   
   const version = '1.1.0'; 
-  const [changelogHtml, setChangelogHtml] = useState<string>('');
+  const [changelogText, setChangelogText] = useState<string>('');
   const [loadingChangelog, setLoadingChangelog] = useState<boolean>(true);
-
-  const parseMarkdown = useCallback((markdown: string): string => {
-    const lines = markdown.split('\n');
-    let html = '';
-    let inList = false;
-
-    lines.forEach(line => {
-      if (line.startsWith('## ')) {
-        if (inList) {
-          html += '</ul>';
-          inList = false;
-        }
-        html += `<h3 class="text-lg md:text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200">${line.substring(3)}</h3>`;
-      } else if (line.startsWith('# ')) {
-        if (inList) {
-          html += '</ul>';
-          inList = false;
-        }
-        html += `<h2 class="text-2xl md:text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100">${line.substring(2)}</h2>`;
-      } else if (line.startsWith('- ')) {
-        if (!inList) {
-          html += '<ul class="space-y-2 text-gray-600 dark:text-gray-300">';
-          inList = true;
-        }
-        let listItem = line.substring(2);
-        listItem = listItem.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-700 dark:text-gray-100">$1</strong>');
-        html += `<li class="ml-5 list-disc">${listItem}</li>`;
-      } else {
-        if (inList) {
-          html += '</ul>';
-          inList = false;
-        }
-        if (line.trim() !== '') {
-          html += `<p class="text-gray-600 dark:text-gray-300">${line}</p>`;
-        }
-      }
-    });
-
-    if (inList) {
-      html += '</ul>';
-    }
-
-    return html;
-  }, []);
 
   useEffect(() => {
     fetch('/changelog.md')
@@ -68,16 +26,16 @@ const About: React.FC = () => {
         return response.text();
       })
       .then(text => {
-        setChangelogHtml(parseMarkdown(text));
+        setChangelogText(text);
       })
       .catch(error => {
         console.error('Error fetching changelog:', error);
-        setChangelogHtml('<p>Could not load changelog.</p>');
+        setChangelogText('Could not load changelog.');
       })
       .finally(() => {
         setLoadingChangelog(false);
       });
-  }, [parseMarkdown]);
+  }, []);
 
   return (
     <div className="h-full flex flex-col items-center p-8 overflow-y-auto">
@@ -126,7 +84,31 @@ const About: React.FC = () => {
             {loadingChangelog ? (
               <p className="text-center text-gray-500 dark:text-gray-400">Loading changelog...</p>
             ) : (
-              <div dangerouslySetInnerHTML={{ __html: changelogHtml }} />
+              <ReactMarkdown
+                remarkPlugins={[remarkGfm]}
+                components={{
+                  h1: ({ node, ...props }) => (
+                    <h2 className="text-2xl md:text-3xl font-bold mb-4 text-gray-900 dark:text-gray-100" {...props} />
+                  ),
+                  h2: ({ node, ...props }) => (
+                    <h3 className="text-lg md:text-xl font-semibold mt-6 mb-2 text-gray-800 dark:text-gray-200" {...props} />
+                  ),
+                  ul: ({ node, ...props }) => (
+                    <ul className="space-y-2 text-gray-600 dark:text-gray-300" {...props} />
+                  ),
+                  li: ({ node, ...props }) => (
+                    <li className="ml-5 list-disc" {...props} />
+                  ),
+                  strong: ({ node, ...props }) => (
+                    <strong className="font-semibold text-gray-700 dark:text-gray-100" {...props} />
+                  ),
+                  p: ({ node, ...props }) => (
+                    <p className="text-gray-600 dark:text-gray-300" {...props} />
+                  ),
+                }}
+              >
+                {changelogText}
+              </ReactMarkdown>
             )}
           </div>
         </BlurredCard>

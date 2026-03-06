@@ -5,6 +5,8 @@ import { Kernel } from '../../types';
 import { useAppSelector } from '../../store/hooks';
 import { translations } from '../../data/translations';
 import { kernelChangelogs } from '../../data/changelogs';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 
 interface KernelChangelogModalProps {
     kernel: Kernel;
@@ -17,22 +19,7 @@ const KernelChangelogModal: React.FC<KernelChangelogModalProps> = ({ kernel, onC
         return translations[language]?.[key] || translations['en']?.[key] || key;
     }, [language]);
 
-    const parseMarkdown = useCallback((markdown: string): string => {
-        const lines = markdown.trim().split('\n');
-        let html = '<ul class="space-y-2 text-gray-600 dark:text-gray-300">';
-        lines.forEach(line => {
-            if (line.startsWith('- ')) {
-                let listItem = line.substring(2);
-                listItem = listItem.replace(/\*\*(.*?)\*\*/g, '<strong class="font-semibold text-gray-700 dark:text-gray-100">$1</strong>');
-                html += `<li class="ml-5 list-disc">${listItem}</li>`;
-            }
-        });
-        html += '</ul>';
-        return html;
-    }, []);
-    
-    const changelogContent = kernelChangelogs[kernel.pkg] || '<p>No changelog available for this version.</p>';
-    const changelogHtml = parseMarkdown(changelogContent);
+    const changelogContent = kernelChangelogs[kernel.pkg] || 'No changelog available for this version.';
 
     return (
         <motion.div
@@ -59,7 +46,25 @@ const KernelChangelogModal: React.FC<KernelChangelogModalProps> = ({ kernel, onC
                         </button>
                     </div>
 
-                    <div dangerouslySetInnerHTML={{ __html: changelogHtml }} />
+                    <ReactMarkdown
+                        remarkPlugins={[remarkGfm]}
+                        components={{
+                            ul: ({ node, ...props }) => (
+                                <ul className="space-y-2 text-gray-600 dark:text-gray-300" {...props} />
+                            ),
+                            li: ({ node, ...props }) => (
+                                <li className="ml-5 list-disc" {...props} />
+                            ),
+                            strong: ({ node, ...props }) => (
+                                <strong className="font-semibold text-gray-700 dark:text-gray-100" {...props} />
+                            ),
+                            p: ({ node, ...props }) => (
+                                <p className="text-gray-600 dark:text-gray-300" {...props} />
+                            ),
+                        }}
+                    >
+                        {changelogContent}
+                    </ReactMarkdown>
 
                 </div>
             </motion.div>
