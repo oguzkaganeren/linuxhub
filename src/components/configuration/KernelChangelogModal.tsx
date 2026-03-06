@@ -54,7 +54,7 @@ const KernelChangelogModal: React.FC<KernelChangelogModalProps> = ({ kernel, onC
                 <div className="p-6">
                     <div className="flex justify-between items-center mb-4">
                         <h2 className="text-xl md:text-2xl font-bold">{`Linux ${kernel.version} - ${t('changelog')}`}</h2>
-                        <button onClick={onClose} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-colors z-10">
+                        <button onClick={onClose} className="p-2 rounded-full text-gray-500 dark:text-gray-400 hover:bg-gray-200/80 dark:hover:bg-gray-700/80 transition-colors z-10" aria-label={t('close')}>
                             <X size={24} />
                         </button>
                     </div>
