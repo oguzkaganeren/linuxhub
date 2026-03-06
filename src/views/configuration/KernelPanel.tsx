@@ -41,9 +41,148 @@ const formatKernelPackageName = (pkg: string): string => {
     .join(" ");
 };
 
+const KernelRow: React.FC<{
+  k: Kernel;
+  installedKernels: InstalledKernel[];
+  onShowChangelog: (kernel: Kernel) => void;
+  onRemove: (kernel: Kernel) => void;
+}> = React.memo(({ k, installedKernels, onShowChangelog, onRemove }) => {
+  const dispatch = useAppDispatch();
+  // ⚡ Bolt Optimization: Only subscribe to this specific kernel's package state.
+  // This prevents the entire KernelPanel list from re-rendering whenever
+  // ANY package's installation progress updates.
+  const state = useAppSelector((state) => state.packages.packagesState[k.pkg]);
+  const language = useAppSelector((state) => state.app.language);
+
+  const t = useCallback(
+    (key: string): string => {
+      return translations[language]?.[key] || translations["en"]?.[key] || key;
+    },
+    [language]
+  );
+
+  const renderButton = () => {
+    const isInstalled =
+      state?.status === PackageStatus.Installed ||
+      installedKernels.some(
+        (ik) => ik.version === k.version && state === undefined
+      );
+
+    if (state?.status === PackageStatus.Installing) {
+      return (
+        <div className="w-28 text-center">
+          <div className="w-full bg-gray-300/50 dark:bg-gray-700/50 rounded-full h-2">
+            <motion.div
+              className="bg-[var(--primary-color)] h-2 rounded-full"
+              animate={{ width: `${state.progress || 0}%` }}
+              transition={{ duration: 0.3, ease: "linear" }}
+            />
+          </div>
+          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
+            {Math.round(state.progress || 0)}%
+          </p>
+        </div>
+      );
+    }
+    if (state?.status === PackageStatus.Error) {
+      return (
+        <button
+          onClick={() => dispatch(install(k.pkg))}
+          title={state.error}
+          className="px-4 py-1.5 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors w-28 text-center"
+        >
+          {t("retry")}
+        </button>
+      );
+    }
+
+    if (isInstalled) {
+      if (k.running) {
+        return (
+          <button
+            disabled
+            className="px-4 py-1.5 text-sm bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 font-semibold rounded-md cursor-not-allowed w-28 text-center"
+          >
+            {t("installed")}
+          </button>
+        );
+      }
+      return (
+        <button
+          onClick={() => onRemove(k)}
+          className="px-4 py-1.5 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors w-28 text-center"
+        >
+          {t("remove")}
+        </button>
+      );
+    }
+
+    return (
+      <button
+        onClick={() => dispatch(install(k.pkg))}
+        className="px-4 py-1.5 text-sm bg-[var(--primary-color)] text-white font-semibold rounded-md hover:brightness-90 transition-all w-28 text-center"
+      >
+        {t("install")}
+      </button>
+    );
+  };
+
+  return (
+    <div
+      className={`flex justify-between items-center p-3 rounded-lg transition-colors ${
+        k.running ? "bg-[var(--primary-color)]/10" : ""
+      } ${
+        state?.status === PackageStatus.Error
+          ? "bg-red-500/10"
+          : "hover:bg-gray-100/80 dark:hover:bg-gray-700/50"
+      }`}
+    >
+      <div className="flex-grow pr-4 overflow-hidden">
+        <p
+          className="font-semibold text-lg text-gray-800 dark:text-gray-200 truncate"
+          title={formatKernelPackageName(k.pkg)}
+        >
+          {formatKernelPackageName(k.pkg)}
+        </p>
+        <p
+          className="text-sm text-gray-500 dark:text-gray-400 truncate -mt-1"
+          title={k.version}
+        >
+          {k.version}
+        </p>
+        <div className="flex items-center gap-2 mt-2">
+          {k.running && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-200 dark:bg-green-900/50 text-green-800 dark:text-green-300">
+              {t("running")}
+            </span>
+          )}
+          {k.releaseType === "lts" && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-200 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300">
+              {t("lts")}
+            </span>
+          )}
+          {k.releaseType === "recommended" && (
+            <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-200 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300">
+              {t("recommended")}
+            </span>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 flex-shrink-0">
+        <button
+          onClick={() => onShowChangelog(k)}
+          className="px-4 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
+        >
+          {t("changelog")}
+        </button>
+        {renderButton()}
+      </div>
+    </div>
+  );
+});
+
 const KernelPanel: React.FC = () => {
   const dispatch = useAppDispatch();
-  const packagesState = useAppSelector((state) => state.packages.packagesState);
   const language = useAppSelector((state) => state.app.language);
   const [changelogKernel, setChangelogKernel] = useState<Kernel | null>(null);
 
@@ -172,7 +311,7 @@ const KernelPanel: React.FC = () => {
     fetchKernels();
   }, []);
 
-  const handleRemove = (kernel: Kernel) => {
+  const handleRemove = useCallback((kernel: Kernel) => {
     const confirmationText = t("remove_kernel_confirm_text").replace(
       "{kernelVersion}",
       `Linux ${kernel.version}`
@@ -180,74 +319,11 @@ const KernelPanel: React.FC = () => {
     if (window.confirm(confirmationText)) {
       dispatch(remove(kernel.pkg));
     }
-  };
+  }, [dispatch, t]);
 
-  const renderButton = (kernel: Kernel) => {
-    const state = packagesState[kernel.pkg];
-    const isInstalled =
-      state?.status === PackageStatus.Installed ||
-      installedKernels.some(
-        (k) => k.version === kernel.version && state === undefined
-      );
-
-    if (state?.status === PackageStatus.Installing) {
-      return (
-        <div className="w-28 text-center">
-          <div className="w-full bg-gray-300/50 dark:bg-gray-700/50 rounded-full h-2">
-            <motion.div
-              className="bg-[var(--primary-color)] h-2 rounded-full"
-              animate={{ width: `${state.progress || 0}%` }}
-              transition={{ duration: 0.3, ease: "linear" }}
-            />
-          </div>
-          <p className="text-xs text-gray-600 dark:text-gray-400 mt-1">
-            {Math.round(state.progress || 0)}%
-          </p>
-        </div>
-      );
-    }
-    if (state?.status === PackageStatus.Error) {
-      return (
-        <button
-          onClick={() => dispatch(install(kernel.pkg))}
-          title={state.error}
-          className="px-4 py-1.5 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors w-28 text-center"
-        >
-          {t("retry")}
-        </button>
-      );
-    }
-
-    if (isInstalled) {
-      if (kernel.running) {
-        return (
-          <button
-            disabled
-            className="px-4 py-1.5 text-sm bg-gray-300 dark:bg-gray-600 text-gray-600 dark:text-gray-300 font-semibold rounded-md cursor-not-allowed w-28 text-center"
-          >
-            {t("installed")}
-          </button>
-        );
-      }
-      return (
-        <button
-          onClick={() => handleRemove(kernel)}
-          className="px-4 py-1.5 text-sm bg-red-500 text-white font-semibold rounded-md hover:bg-red-600 transition-colors w-28 text-center"
-        >
-          {t("remove")}
-        </button>
-      );
-    }
-
-    return (
-      <button
-        onClick={() => dispatch(install(kernel.pkg))}
-        className="px-4 py-1.5 text-sm bg-[var(--primary-color)] text-white font-semibold rounded-md hover:brightness-90 transition-all w-28 text-center"
-      >
-        {t("install")}
-      </button>
-    );
-  };
+  const handleShowChangelog = useCallback((kernel: Kernel) => {
+    setChangelogKernel(kernel);
+  }, []);
 
   const renderContent = () => {
     if (loading) {
@@ -293,55 +369,13 @@ const KernelPanel: React.FC = () => {
         <BlurredCard className="p-4">
           <div className="space-y-2">
             {paginatedKernels.map((k) => (
-              <div
+              <KernelRow
                 key={`${k.pkg}-${k.version}`}
-                className={`flex justify-between items-center p-3 rounded-lg transition-colors ${k.running ? "bg-[var(--primary-color)]/10" : ""
-                  } ${packagesState[k.pkg]?.status === PackageStatus.Error
-                    ? "bg-red-500/10"
-                    : "hover:bg-gray-100/80 dark:hover:bg-gray-700/50"
-                  }`}
-              >
-                <div className="flex-grow pr-4 overflow-hidden">
-                  <p
-                    className="font-semibold text-lg text-gray-800 dark:text-gray-200 truncate"
-                    title={formatKernelPackageName(k.pkg)}
-                  >
-                    {formatKernelPackageName(k.pkg)}
-                  </p>
-                  <p
-                    className="text-sm text-gray-500 dark:text-gray-400 truncate -mt-1"
-                    title={k.version}
-                  >
-                    {k.version}
-                  </p>
-                  <div className="flex items-center gap-2 mt-2">
-                    {k.running && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-green-200 dark:bg-green-900/50 text-green-800 dark:text-green-300">
-                        {t("running")}
-                      </span>
-                    )}
-                    {k.releaseType === "lts" && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-purple-200 dark:bg-purple-900/50 text-purple-800 dark:text-purple-300">
-                        {t("lts")}
-                      </span>
-                    )}
-                    {k.releaseType === "recommended" && (
-                      <span className="text-xs font-bold px-2 py-0.5 rounded-full bg-yellow-200 dark:bg-yellow-900/50 text-yellow-800 dark:text-yellow-300">
-                        {t("recommended")}
-                      </span>
-                    )}
-                  </div>
-                </div>
-                <div className="flex items-center gap-2 flex-shrink-0">
-                  <button
-                    onClick={() => setChangelogKernel(k)}
-                    className="px-4 py-1.5 text-sm bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-200 font-semibold rounded-md hover:bg-gray-300 dark:hover:bg-gray-600 transition-colors"
-                  >
-                    {t("changelog")}
-                  </button>
-                  {renderButton(k)}
-                </div>
-              </div>
+                k={k}
+                installedKernels={installedKernels}
+                onShowChangelog={handleShowChangelog}
+                onRemove={handleRemove}
+              />
             ))}
           </div>
         </BlurredCard>

@@ -12,7 +12,114 @@ import {
 } from "../store/packagesSlice";
 import { translations } from "../data/translations";
 import toast from "react-hot-toast";
-import { PackageStatus } from "../types";
+import { App, PackageStatus } from "../types";
+
+const InstallQueueItem = React.memo(({
+  app,
+  onRemove,
+  onRetry
+}: {
+  app: App,
+  onRemove: (pkg: string, name: string, status?: PackageStatus) => void,
+  onRetry: (pkg: string) => void
+}) => {
+  const language = useAppSelector((state) => state.app.language);
+  // ⚡ Bolt Optimization: Subscribe only to the specific app's installation state.
+  // This avoids re-rendering the entire InstallQueue (and its animations)
+  // whenever any single app's progress bar ticks forward.
+  const state = useAppSelector((state) => state.packages.packagesState[app.pkg]);
+
+  const t = useCallback(
+    (key: string): string => {
+      return translations[language]?.[key] || translations["en"]?.[key] || key;
+    },
+    [language]
+  );
+
+  const progress = state?.progress ?? 0;
+  const progressDetail = state?.progressDetail;
+  const isError = state?.status === PackageStatus.Error;
+
+  return (
+    <motion.div
+      layout
+      title={isError ? state.error : ""}
+      initial={{ opacity: 0, x: -20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: 20, transition: { duration: 0.15 } }}
+      className={`flex items-center gap-4 p-2 rounded-lg ${
+        isError ? "bg-red-500/10" : ""
+      }`}
+    >
+      <AppIcon
+        name={app.icon}
+        className="w-10 h-10 flex-shrink-0"
+      />
+      <div className="flex-grow overflow-hidden">
+        <p className="font-semibold truncate">{app.name}</p>
+        {isError ? (
+          <div className="flex items-center gap-2 mt-1">
+            <AppIcon
+              name="error"
+              className="w-4 h-4 text-red-500"
+            />
+            <p className="text-sm font-semibold text-red-500">
+              {t("error")}
+            </p>
+          </div>
+        ) : (
+          <div className="mt-1">
+            <div className="flex items-center gap-2">
+              <div
+                className="w-full bg-gray-300/50 dark:bg-gray-700/50 rounded-full h-2.5 overflow-hidden"
+                role="progressbar"
+                aria-valuenow={progress}
+                aria-valuemin={0}
+                aria-valuemax={100}
+                aria-label={`Installing ${app.name}`}
+              >
+                <motion.div
+                  className="bg-[var(--primary-color)] h-2.5 rounded-full"
+                  animate={{ width: `${progress}%` }}
+                  transition={{ duration: 0.3, ease: "linear" }}
+                />
+              </div>
+              <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-right">
+                {Math.round(progress)}%
+              </span>
+            </div>
+            {progressDetail && (
+              <p
+                className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate"
+                title={progressDetail}
+              >
+                {progressDetail}
+              </p>
+            )}
+          </div>
+        )}
+      </div>
+      <div className="flex items-center flex-shrink-0">
+        {isError && (
+          <button
+            onClick={() => onRetry(app.pkg)}
+            className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-[var(--primary-color)]/20 hover:text-[var(--primary-color)] transition-colors"
+            aria-label={`Retry installation of ${app.name}`}
+          >
+            <RefreshCw size={18} />
+          </button>
+        )}
+        <button
+          onClick={() => onRemove(app.pkg, app.name, state?.status)}
+          className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-500/20 hover:text-red-500 transition-colors"
+          aria-label={`Cancel installation of ${app.name}`}
+        >
+          <X size={18} />
+        </button>
+      </div>
+    </motion.div>
+  );
+});
 
 interface InstallQueueProps {
   onClose: () => void;
@@ -21,7 +128,6 @@ interface InstallQueueProps {
 const InstallQueue: React.FC<InstallQueueProps> = ({ onClose }) => {
   const dispatch = useAppDispatch();
   const installQueue = useAppSelector(selectInstallQueue);
-  const packagesState = useAppSelector((state) => state.packages.packagesState);
   const language = useAppSelector((state) => state.app.language);
 
   const t = useCallback(
@@ -31,19 +137,18 @@ const InstallQueue: React.FC<InstallQueueProps> = ({ onClose }) => {
     [language]
   );
 
-  const handleRemove = (pkg: string, name: string) => {
-    const state = packagesState[pkg];
-    if (state?.status === PackageStatus.Installing) {
+  const handleRemove = useCallback((pkg: string, name: string, status?: PackageStatus) => {
+    if (status === PackageStatus.Installing) {
       dispatch(cancelInstallation(pkg));
-    } else if (state?.status === PackageStatus.Error) {
+    } else if (status === PackageStatus.Error) {
       dispatch(removeFromQueue(pkg));
       toast.success(`${name} ${t("toast_removed_from_queue")}`);
     }
-  };
+  }, [dispatch, t]);
 
-  const handleRetry = (pkg: string) => {
+  const handleRetry = useCallback((pkg: string) => {
     dispatch(install(pkg));
-  };
+  }, [dispatch]);
 
   return (
     <motion.div
@@ -66,93 +171,14 @@ const InstallQueue: React.FC<InstallQueueProps> = ({ onClose }) => {
 
         <div className="flex flex-col gap-2 max-h-64 overflow-y-auto pr-2">
           <AnimatePresence>
-            {installQueue.map((app) => {
-              const state = packagesState[app.pkg];
-              const progress = state?.progress ?? 0;
-              const progressDetail = state?.progressDetail;
-              const isError = state?.status === PackageStatus.Error;
-
-              return (
-                <motion.div
-                  key={app.pkg}
-                  layout
-                  title={isError ? state.error : ""}
-                  initial={{ opacity: 0, x: -20 }}
-                  animate={{ opacity: 1, x: 0 }}
-                  exit={{ opacity: 0, x: 20, transition: { duration: 0.15 } }}
-                  className={`flex items-center gap-4 p-2 rounded-lg ${
-                    isError ? "bg-red-500/10" : ""
-                  }`}
-                >
-                  <AppIcon
-                    name={app.icon}
-                    className="w-10 h-10 flex-shrink-0"
-                  />
-                  <div className="flex-grow overflow-hidden">
-                    <p className="font-semibold truncate">{app.name}</p>
-                    {isError ? (
-                      <div className="flex items-center gap-2 mt-1">
-                        <AppIcon
-                          name="error"
-                          className="w-4 h-4 text-red-500"
-                        />
-                        <p className="text-sm font-semibold text-red-500">
-                          {t("error")}
-                        </p>
-                      </div>
-                    ) : (
-                      <div className="mt-1">
-                        <div className="flex items-center gap-2">
-                          <div
-                            className="w-full bg-gray-300/50 dark:bg-gray-700/50 rounded-full h-2.5 overflow-hidden"
-                            role="progressbar"
-                            aria-valuenow={progress}
-                            aria-valuemin={0}
-                            aria-valuemax={100}
-                            aria-label={`Installing ${app.name}`}
-                          >
-                            <motion.div
-                              className="bg-[var(--primary-color)] h-2.5 rounded-full"
-                              animate={{ width: `${progress}%` }}
-                              transition={{ duration: 0.3, ease: "linear" }}
-                            />
-                          </div>
-                          <span className="text-sm font-mono text-gray-600 dark:text-gray-400 w-12 text-right">
-                            {Math.round(progress)}%
-                          </span>
-                        </div>
-                        {progressDetail && (
-                          <p
-                            className="text-xs text-gray-500 dark:text-gray-400 mt-1 truncate"
-                            title={progressDetail}
-                          >
-                            {progressDetail}
-                          </p>
-                        )}
-                      </div>
-                    )}
-                  </div>
-                  <div className="flex items-center flex-shrink-0">
-                    {isError && (
-                      <button
-                        onClick={() => handleRetry(app.pkg)}
-                        className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-[var(--primary-color)]/20 hover:text-[var(--primary-color)] transition-colors"
-                        aria-label={`Retry installation of ${app.name}`}
-                      >
-                        <RefreshCw size={18} />
-                      </button>
-                    )}
-                    <button
-                      onClick={() => handleRemove(app.pkg, app.name)}
-                      className="p-1.5 rounded-full text-gray-500 dark:text-gray-400 hover:bg-red-500/20 hover:text-red-500 transition-colors"
-                      aria-label={`Cancel installation of ${app.name}`}
-                    >
-                      <X size={18} />
-                    </button>
-                  </div>
-                </motion.div>
-              );
-            })}
+            {installQueue.map((app) => (
+              <InstallQueueItem
+                key={app.pkg}
+                app={app}
+                onRemove={handleRemove}
+                onRetry={handleRetry}
+              />
+            ))}
           </AnimatePresence>
           {installQueue.length === 0 && (
             <div className="text-center py-10 text-gray-500 dark:text-gray-400">
