@@ -1,0 +1,4 @@
+## 2025-03-07 - [Removal of Arbitrary Command Execution API endpoints]
+**Vulnerability:** The Tauri backend exposed `run_shell_command_with_result` (`Command::new("sh").arg("-c").arg(command)`) and `run_elevated_command` (`StdCommand::new("/usr/bin/pkexec").arg("sh").arg("-c").arg(command_to_run)`) endpoints directly to the frontend.
+**Learning:** This is a classic example of exposing a generic OS-level interface to the frontend instead of implementing specific, purpose-built APIs. It resulted in massive Command Injection risks, where any XSS or frontend compromise could execute arbitrary commands and even elevate privileges using `pkexec`.
+**Prevention:** Never expose a general shell execution command to the frontend in a desktop application framework like Tauri. Instead, build strict API endpoints that perform exactly what the application needs with strictly typed, parameterized inputs.
