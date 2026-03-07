@@ -67,6 +67,7 @@ const AddPrinterModal: React.FC<AddPrinterModalProps> = ({ onClose }) => {
         className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1"
       >
         {label}
+        {required && <span className="text-red-500 ml-1">*</span>}
       </label>
       <input
         type="text"
@@ -75,6 +76,7 @@ const AddPrinterModal: React.FC<AddPrinterModalProps> = ({ onClose }) => {
         value={formData[id]}
         onChange={handleChange}
         required={required}
+        aria-required={required}
         placeholder={placeholder}
         className="w-full px-3 py-2 rounded-md bg-white dark:bg-gray-700/80 border border-gray-300 dark:border-gray-600 focus:ring-2 focus:ring-[var(--primary-color)] focus:outline-none"
       />
@@ -105,7 +107,8 @@ const AddPrinterModal: React.FC<AddPrinterModalProps> = ({ onClose }) => {
             </h2>
             <button
               onClick={onClose}
-              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700"
+              className="p-2 rounded-full hover:bg-gray-200 dark:hover:bg-gray-700 focus-visible:ring-2 focus-visible:outline-none focus-visible:ring-[var(--primary-color)]"
+              aria-label={t("close")}
             >
               <X size={24} />
             </button>
